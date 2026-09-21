@@ -9,12 +9,15 @@ pour l'activer:
     sous windows powershell: .\venv\Scripts\Activate.ps1
     sous windows cmd: venv\Scripts\activate
 
-faut avooir/installer: python, pip(outils peremttant l installations des bibliothèques), 
+faut avoir/installer: 
 
-pandas
+    python, 
+    pip(outils peremttant l installations des bibliothèques), 
+    pandas,
+    numpy,
+    jupyter,
+    scikit-learn
 
-numpy
-
-jupyter
-
-python -m pip install pandas numpy jupyter
+commande pour installer les bibliothèques:
+    python -m pip install pandas numpy jupyter
+    python -m pip install scikit-learn
