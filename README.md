@@ -16,8 +16,10 @@ faut avoir/installer:
     pandas,
     numpy,
     jupyter,
-    scikit-learn
+    scikit-learn,
+    xgboost
 
 commande pour installer les bibliothèques:
     python -m pip install pandas numpy jupyter
     python -m pip install scikit-learn
+    python -m pip install xgboost
