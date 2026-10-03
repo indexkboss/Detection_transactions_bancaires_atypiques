@@ -19,3 +19,5 @@ Thumbs.db
 # Data
 data/raw/
 data/processed/
+
+data/processed/decisions.db
