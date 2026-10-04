@@ -82,22 +82,46 @@ def prepare_upload(raw, force_unsupervised=False):
             "Fournir un fichier scoré (RiskScore, RiskLevel) ou un fichier brut de transactions."
         )
 
+    # artifacts = None if force_unsupervised else load_artifacts(MODELS_DIR)
+    # if artifacts is None:
+    #     artifacts = fit_unsupervised(raw)
+    #     st.sidebar.info("Mode non supervisé : Isolation Forest entraîné sur ce fichier, "
+    #                     "sans étiquettes.")
+    # # scored = score_transactions(raw, artifacts)
+
+    # if "Currency" in raw.columns:          # conserve la devise du fichier (ex. MAD)
+    #     scored["Currency"] = raw["Currency"]
+    # scored = score_transactions(raw, artifacts)
+
+    # top = scored.sort_values("RiskScore", ascending=False).head(EXPLAIN_TOP_N)
+    # scored = scored.join(explain(raw.loc[top.index], artifacts, reference=raw))
+    # for col in ("TopRiskFactors", "AnomalyReasons"):
+    #     scored[col] = scored[col].fillna("")
+    # return raw.drop(columns=["isFraud"], errors="ignore")
+
+        # Données en dirhams : XGBoost a été entraîné sur IEEE-CIS (USD), on force le non supervisé
+    if "Currency" in raw.columns and raw["Currency"].astype(str).eq("MAD").all():
+        force_unsupervised = True
+
     artifacts = None if force_unsupervised else load_artifacts(MODELS_DIR)
     if artifacts is None:
         artifacts = fit_unsupervised(raw)
         st.sidebar.info("Mode non supervisé : Isolation Forest entraîné sur ce fichier, "
                         "sans étiquettes.")
-    # scored = score_transactions(raw, artifacts)
 
+    scored = score_transactions(raw, artifacts)
     if "Currency" in raw.columns:          # conserve la devise du fichier (ex. MAD)
         scored["Currency"] = raw["Currency"]
-    scored = score_transactions(raw, artifacts)
 
     top = scored.sort_values("RiskScore", ascending=False).head(EXPLAIN_TOP_N)
     scored = scored.join(explain(raw.loc[top.index], artifacts, reference=raw))
     for col in ("TopRiskFactors", "AnomalyReasons"):
         scored[col] = scored[col].fillna("")
-    return raw.drop(columns=["isFraud"], errors="ignore")
+
+    # Garde les colonnes brutes utiles à l'analyste (carte, email, appareil...)
+    extra = [c for c in raw.columns if c not in scored.columns and c != "isFraud"]
+    scored = scored.join(raw[extra])
+    return scored.drop(columns=["isFraud"], errors="ignore")
 
 
 def get_queue(uploaded_file, force_unsupervised=False):
@@ -422,7 +446,7 @@ else:
             source=uploaded_file.name if uploaded_file is not None else "analyst_queue",
             review_date=review_time,
         )
-        st.success("Décision enregistrée dans l'historique.")
+        st.toast("Décision enregistrée dans l'historique.", icon="✔️")
         st.rerun()
 
 # 11. HISTORIQUE
@@ -444,4 +468,4 @@ st.download_button("Télécharger les transactions filtrées",
                    data=filtered_df.to_csv(index=False).encode("utf-8"),
                    file_name="filtered_transactions.csv", mime="text/csv")
 
-st.caption("Prototype de dashboard analyste — les décisions humaines sont enregistrées localement en CSV.")
+st.caption("Prototype de dashboard analyste — les décisions humaines sont enregistrées localement dans SQLite (decisions.db).")

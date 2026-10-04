@@ -168,7 +168,7 @@ streamlit run app.py
 ### Tester avec des données en dirhams
 1. `python scripts/generate_synthetic_mad.py`
 2. Dans le dashboard, importe `data/synthetic/synthetic_mad.csv`.
-3. **Coche « Mode non supervisé uniquement »** : le modèle XGBoost est entraîné sur IEEE-CIS et n'a pas de sens pour ces données. L'Isolation Forest est alors entraîné sur le fichier importé.
+3. Le **mode non supervisé s'active automatiquement** pour les fichiers en `MAD` : le modèle XGBoost est entraîné sur IEEE-CIS et n'a pas de sens pour ces données. L'Isolation Forest est alors entraîné sur le fichier importé. (La case « Mode non supervisé uniquement » permet de forcer ce mode sur n'importe quel fichier.)
 
 ---
 
@@ -183,7 +183,7 @@ streamlit run app.py
 - *XGBoost* : `scale_pos_weight` ≈ 27,4 pour compenser le déséquilibre, métrique d'évaluation `aucpr`.
 - *Isolation Forest* : 200 arbres, entraîné **sans** `isFraud`.
 
-**Seuil de décision XGBoost.** Choisi sur la **validation** en maximisant le F1 (0,787), puis figé pour le test. Le jeu de test n'intervient jamais dans un choix de paramètre.
+**Seuil de décision XGBoost.** Choisi sur la **validation** en maximisant le F1 (seuil = 0,787), puis figé pour le test. Le jeu de test n'intervient jamais dans un choix de paramètre.
 
 **Score de risque.**
 - Mode hybride : `RiskScore = (0,7 × probabilité XGBoost + 0,3 × anomalie normalisée) × 100`

@@ -19,5 +19,7 @@ Thumbs.db
 # Data
 data/raw/
 data/processed/
+*.db
 
-data/processed/decisions.db
+# Jupyter
+.ipynb_checkpoints/
